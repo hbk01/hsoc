@@ -14,24 +14,72 @@ public class Config {
     private CommandLine commandLine;
 
     /**
+     * define the options opt and longOpt.
+     */
+    protected enum Name {
+        /**
+         * port
+         */
+        PORT("p", "port"),
+
+        /**
+         * address
+         */
+        ADDRESS("a", "address"),
+
+        /**
+         * help
+         */
+        HELP("h", "help"),
+
+        /**
+         * client
+         */
+        CLIENT("c", "client");
+
+        public String opt;
+        public String longOpt;
+
+        /**
+         * Create the object.
+         * @param opt     option name
+         * @param longOpt long option name
+         */
+        Name(String opt, String longOpt) {
+            this.opt = opt;
+            this.longOpt = longOpt;
+        }
+
+        /**
+         * convert to string
+         * @return string
+         */
+        @Override
+        public String toString() {
+            return longOpt;
+        }
+    }
+
+
+    /**
      * Initial the config.
      * @param arguments args
      * @throws ParseException if parse error.
      */
     public Config(String[] arguments) throws ParseException {
-        options.addOption(Option.builder("h")
-                .longOpt("help")
+        options.addOption(Option.builder(Name.HELP.opt)
+                .longOpt(Name.HELP.longOpt)
                 .desc("show help of the program.")
                 .optionalArg(true)
                 .build()
         );
-        options.addOption(Option.builder("c")
-                .longOpt("client")
+        options.addOption(Option.builder(Name.CLIENT.opt)
+                .longOpt(Name.CLIENT.longOpt)
                 .desc("run in client mode.")
                 .build()
         );
-        options.addOption(Option.builder("p")
-                .longOpt("port")
+        options.addOption(Option.builder(Name.PORT.opt)
+                .longOpt(Name.PORT.longOpt)
                 .desc("in server mode, receive message this port. \n" +
                         "in client mode, send message to this port.")
                 .hasArg(true)
@@ -39,8 +87,8 @@ public class Config {
                 .type(int.class)
                 .build()
         );
-        options.addOption(Option.builder("a")
-                .longOpt("address")
+        options.addOption(Option.builder(Name.ADDRESS.opt)
+                .longOpt(Name.ADDRESS.longOpt)
                 .desc("connection this ip address. (client mode only)")
                 .hasArg(true)
                 .argName("ADDRESS")
@@ -56,7 +104,7 @@ public class Config {
      * @return mode
      */
     public boolean runAsClient() {
-        return commandLine.hasOption("client");
+        return commandLine.hasOption(Name.CLIENT.opt);
     }
 
     /**
@@ -64,10 +112,12 @@ public class Config {
      * @return port. if no set, return 9010.
      */
     public int port() {
-        if (commandLine.hasOption("port")) {
-            String arg = commandLine.getOptionValue("port", "9010");
+        if (commandLine.hasOption(Name.PORT.opt)) {
+            String arg = commandLine.getOptionValue(Name.PORT.opt, "9010");
             return Integer.parseInt(arg);
-        } else return 9010;
+        } else {
+            return 9010;
+        }
     }
 
     /**
@@ -75,8 +125,8 @@ public class Config {
      * @return ip address
      */
     public Inet4Address address() {
-        if (commandLine.hasOption("address")) {
-            String address = commandLine.getOptionValue("address", "");
+        if (commandLine.hasOption(Name.ADDRESS.opt)) {
+            String address = commandLine.getOptionValue(Name.ADDRESS.opt, "");
             // String regex = "\\d{3}.\\d{3}.\\d{1,3}.\\d{1,3}";
             try {
                 return (Inet4Address) Inet4Address.getByName(address);
@@ -84,7 +134,9 @@ public class Config {
                 e.printStackTrace();
                 return null;
             }
-        } else return null;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -92,7 +144,7 @@ public class Config {
      * @return true if has help option.
      */
     public boolean help() {
-        return commandLine.hasOption("help");
+        return commandLine.hasOption(Name.HELP.opt);
     }
 
     /**
@@ -111,8 +163,8 @@ public class Config {
      * @param opt option name
      * @return if has the option, return true
      */
-    public boolean hasOption(String opt) {
-        return commandLine.hasOption(opt);
+    public boolean hasOption(Name opt) {
+        return commandLine.hasOption(opt.longOpt);
     }
 
     /**
