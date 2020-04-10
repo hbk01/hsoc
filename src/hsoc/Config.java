@@ -2,6 +2,9 @@ package hsoc;
 
 import org.apache.commons.cli.*;
 
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
+
 /**
  * Config the program how to run.
  * @author hbk01 2020/04/09 21:02
@@ -24,12 +27,13 @@ public class Config {
         );
         options.addOption(Option.builder("c")
                 .longOpt("client")
-                .desc("run as client.")
+                .desc("run in client mode.")
                 .build()
         );
         options.addOption(Option.builder("p")
                 .longOpt("port")
-                .desc("bind the port.")
+                .desc("in server mode, receive message this port. \n" +
+                        "in client mode, send message to this port.")
                 .hasArg(true)
                 .argName("PORT")
                 .type(int.class)
@@ -37,7 +41,7 @@ public class Config {
         );
         options.addOption(Option.builder("a")
                 .longOpt("address")
-                .desc("connection this ip address. (run as client only)")
+                .desc("connection this ip address. (client mode only)")
                 .hasArg(true)
                 .argName("ADDRESS")
                 .type(String.class)
@@ -70,12 +74,17 @@ public class Config {
      * Get the server's ip address, it's only client mode used.
      * @return ip address
      */
-    public String address() {
+    public Inet4Address address() {
         if (commandLine.hasOption("address")) {
             String address = commandLine.getOptionValue("address", "");
-            String regex = "\\d{3}.\\d{3}.\\d{1,3}.\\d{1,3}";
-            return address.matches(regex) ? address : "";
-        } else return "";
+            // String regex = "\\d{3}.\\d{3}.\\d{1,3}.\\d{1,3}";
+            try {
+                return (Inet4Address) Inet4Address.getByName(address);
+            } catch (UnknownHostException e) {
+                e.printStackTrace();
+                return null;
+            }
+        } else return null;
     }
 
     /**
@@ -91,7 +100,10 @@ public class Config {
      */
     public void usage() {
         HelpFormatter help = new HelpFormatter();
-        help.printHelp("hsoc", options);
+        String header = "options: ";
+        String footer = "feedback: https://github.com/hbk01/hsoc/issues\n" +
+                "feedback: https://gitee.com/hbk01/hsoc/issues";
+        help.printHelp("hsoc", header, options, footer, true);
     }
 
     /**
@@ -109,5 +121,24 @@ public class Config {
      */
     public CommandLine getCommandLine() {
         return commandLine;
+    }
+
+    /**
+     * return the config.
+     * @return config
+     */
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        String tab = "\t";
+        String newline = System.lineSeparator();
+        builder.append("Config {").append(newline);
+        builder.append(tab).append("port: ").append(port()).append(newline);
+        if (runAsClient()) {
+            builder.append(tab).append("addr: ").append(address().getHostAddress()).append(newline);
+        }
+        builder.append(tab).append("mode: ").append(runAsClient() ? "client" : "server").append(newline);
+        builder.append("}");
+        return builder.toString();
     }
 }
