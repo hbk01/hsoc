@@ -4,6 +4,7 @@ import org.apache.commons.cli.ParseException;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Scanner;
 
 /**
  * be a client to connect server.
@@ -11,9 +12,6 @@ import java.net.Socket;
  */
 public class Client implements Runnable {
     private Config config;
-
-    private Client() {
-    }
 
     public Client(String[] args) {
         try {
@@ -27,8 +25,18 @@ public class Client implements Runnable {
     public void run() {
         try {
             Socket socket = new Socket(config.address(), config.port());
-            socket.getOutputStream().write("hello".getBytes());
-            System.out.println(socket.getInetAddress().getHostAddress() + ":" + socket.getPort());
+            String ip = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
+            System.out.println("- connect to " + ip);
+            Scanner scanner = new Scanner(System.in);
+            while (true) {
+                System.out.print("> ");
+                String line = scanner.nextLine();
+                socket.getOutputStream().write(line.getBytes());
+                if ("exit".equals(line)) {
+                    break;
+                }
+            }
+            scanner.close();
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();

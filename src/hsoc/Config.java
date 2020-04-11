@@ -2,6 +2,7 @@ package hsoc;
 
 import org.apache.commons.cli.*;
 
+import java.io.File;
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
 
@@ -23,7 +24,7 @@ public class Config {
         PORT("p", "port"),
 
         /**
-         * address
+         * address(client only)
          */
         ADDRESS("a", "address"),
 
@@ -35,7 +36,18 @@ public class Config {
         /**
          * client
          */
-        CLIENT("c", "client");
+        CLIENT("c", "client"),
+
+        /**
+         * msg(client only)
+         */
+        MSG("m", "msg"),
+
+        /**
+         * in client mode: send the file.
+         * in server mode: receive the msg save in this file.
+         */
+        FILE("f", "file");
 
         public String opt;
         public String longOpt;
@@ -59,7 +71,6 @@ public class Config {
             return longOpt;
         }
     }
-
 
     /**
      * Initial the config.
@@ -95,6 +106,21 @@ public class Config {
                 .type(String.class)
                 .build()
         );
+        options.addOption(Option.builder(Name.MSG.opt)
+                .longOpt(Name.MSG.longOpt)
+                .desc("send the msg to server. (client only)")
+                .hasArg(true)
+                .argName("MSG")
+                .build()
+        );
+        options.addOption(Option.builder(Name.FILE.opt)
+                .longOpt(Name.FILE.longOpt)
+                .desc("in client mode, send the file to server." +
+                        "in server mode, receive the msg and save in this file.")
+                .hasArg(true)
+                .argName("FILE")
+                .build()
+        );
 
         commandLine = new DefaultParser().parse(options, arguments);
     }
@@ -127,7 +153,6 @@ public class Config {
     public Inet4Address address() {
         if (commandLine.hasOption(Name.ADDRESS.opt)) {
             String address = commandLine.getOptionValue(Name.ADDRESS.opt, "");
-            // String regex = "\\d{3}.\\d{3}.\\d{1,3}.\\d{1,3}";
             try {
                 return (Inet4Address) Inet4Address.getByName(address);
             } catch (UnknownHostException e) {
@@ -137,6 +162,26 @@ public class Config {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Get message. if not set, return "".
+     * @return message
+     */
+    public String message() {
+        return commandLine.hasOption(Name.MSG.opt) ?
+                commandLine.getOptionValue(Name.MSG.opt, "") : "";
+    }
+
+    /**
+     * Get file. if not set, return new File("")
+     * @return file
+     * @see File
+     */
+    public File file() {
+        String path = commandLine.hasOption(Name.FILE.opt) ?
+                commandLine.getOptionValue(Name.FILE.opt, "") : "";
+        return new File(path);
     }
 
     /**
@@ -152,7 +197,7 @@ public class Config {
      */
     public void usage() {
         HelpFormatter help = new HelpFormatter();
-        String header = "options: ";
+        String header = "server be receiver, client be sender.";
         String footer = "feedback: https://github.com/hbk01/hsoc/issues\n" +
                 "feedback: https://gitee.com/hbk01/hsoc/issues";
         help.printHelp("hsoc", header, options, footer, true);
@@ -190,6 +235,12 @@ public class Config {
             builder.append(tab).append("addr: ").append(address().getHostAddress()).append(newline);
         }
         builder.append(tab).append("mode: ").append(runAsClient() ? "client" : "server").append(newline);
+        if (!"".equals(message())) {
+            builder.append(tab).append("msg : ").append(message()).append(newline);
+        }
+        if (!"".equals(file().getAbsolutePath())) {
+            builder.append(tab).append("file: ").append(file().getAbsolutePath()).append(newline);
+        }
         builder.append("}");
         return builder.toString();
     }
