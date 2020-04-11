@@ -28,13 +28,17 @@ public class Server implements Runnable {
         try {
             ServerSocket server = new ServerSocket(config.port());
             Socket socket = server.accept();
-            System.out.println("connect to " + socket.getInetAddress().getHostAddress()
-                    + ":" + socket.getPort());
+            String ip = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
+            System.out.println("- connect to " + ip);
             InputStream inputStream = socket.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+            while (true) {
+                String line = reader.readLine();
+                if ("exit".equals(line)) {
+                    break;
+                } else if (line != null){
+                    System.out.println("< " + line);
+                }
             }
             socket.close();
             server.close();
