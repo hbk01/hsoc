@@ -181,7 +181,7 @@ public class Config {
     public File file() {
         String path = commandLine.hasOption(Name.FILE.opt) ?
                 commandLine.getOptionValue(Name.FILE.opt, "") : "";
-        return new File(path);
+        return "".equals(path) ? null : new File(path);
     }
 
     /**
@@ -238,7 +238,7 @@ public class Config {
         if (!"".equals(message())) {
             builder.append(tab).append("msg : ").append(message()).append(newline);
         }
-        if (!"".equals(file().getAbsolutePath())) {
+        if (file() != null && !"".equals(file().getAbsolutePath())) {
             builder.append(tab).append("file: ").append(file().getAbsolutePath()).append(newline);
         }
         builder.append("}");
