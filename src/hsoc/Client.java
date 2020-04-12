@@ -2,9 +2,11 @@ package hsoc;
 
 import org.apache.commons.cli.ParseException;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.util.Scanner;
+import java.nio.file.Files;
 
 /**
  * be a client to connect server.
@@ -27,16 +29,22 @@ public class Client implements Runnable {
             Socket socket = new Socket(config.address(), config.port());
             String ip = socket.getInetAddress().getHostAddress() + ":" + socket.getPort();
             System.out.println("- connect to " + ip);
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                System.out.print("> ");
-                String line = scanner.nextLine();
-                socket.getOutputStream().write(line.getBytes());
-                if ("exit".equals(line)) {
-                    break;
+            OutputStream os = socket.getOutputStream();
+            if (config.hasOption(Config.Name.MSG)) {
+                os.write(config.message().getBytes());
+            }
+            if (config.hasOption(Config.Name.FILE)) {
+                File file = config.file();
+                if (file != null) {
+                    if (file.isFile()) {
+                        Files.copy(file.toPath(), os);
+                    } else if (file.isDirectory()) {
+                        System.out.println("- [" + file.getAbsolutePath() + "] is a directory. we can't send it.");
+                    }
                 }
             }
-            scanner.close();
+            os.flush();
+            os.close();
             socket.close();
         } catch (IOException e) {
             e.printStackTrace();
