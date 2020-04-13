@@ -106,21 +106,39 @@ public class Config {
                 .type(String.class)
                 .build()
         );
-        options.addOption(Option.builder(Name.MSG.opt)
+//        options.addOption(Option.builder(Name.MSG.opt)
+//                .longOpt(Name.MSG.longOpt)
+//                .desc("send the msg to server. (client only)")
+//                .hasArg(true)
+//                .argName("MSG")
+//                .build()
+//        );
+//        options.addOption(Option.builder(Name.FILE.opt)
+//                .longOpt(Name.FILE.longOpt)
+//                .desc("in client mode, send the file to server." +
+//                        "in server mode, receive the msg and save in this file.")
+//                .hasArg(true)
+//                .argName("FILE")
+//                .build()
+//        );
+
+        OptionGroup group = new OptionGroup();
+        group.addOption(Option.builder(Name.MSG.opt)
                 .longOpt(Name.MSG.longOpt)
-                .desc("send the msg to server. (client only)")
+                .desc("send the msg to server. (client mode only)")
                 .hasArg(true)
-                .argName("MSG")
+                .argName("MESSAGE")
                 .build()
         );
-        options.addOption(Option.builder(Name.FILE.opt)
+        group.addOption(Option.builder(Name.FILE.opt)
                 .longOpt(Name.FILE.longOpt)
-                .desc("in client mode, send the file to server." +
-                        "in server mode, receive the msg and save in this file.")
+                .desc("in client mode, send the file to server.\n" +
+                        "in server mode, receive message and save into file.")
                 .hasArg(true)
                 .argName("FILE")
                 .build()
         );
+        options.addOptionGroup(group);
 
         commandLine = new DefaultParser().parse(options, arguments);
     }
