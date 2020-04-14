@@ -49,6 +49,7 @@ public class Server implements Runnable {
                             Files.copy(socket.getInputStream(), file.toPath(),
                                     StandardCopyOption.REPLACE_EXISTING);
                         }
+                        input.close();
                     } else {
                         String tip = "- [%s] is a directory, we need a file.";
                         System.out.printf(tip, file.getAbsolutePath());
