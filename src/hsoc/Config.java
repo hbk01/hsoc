@@ -11,6 +11,8 @@ import java.net.UnknownHostException;
  * @author hbk01 2020/04/09 21:02
  */
 public class Config {
+    public static final String VERSION_NAME = "v1.0";
+    public static final int VERSION_CODE = 1;
     private Options options = new Options();
     private CommandLine commandLine;
 
@@ -47,7 +49,12 @@ public class Config {
          * in client mode: send the file.
          * in server mode: receive the msg save in this file.
          */
-        FILE("f", "file");
+        FILE("f", "file"),
+
+        /**
+         * print the version
+         */
+        VERSION("v", "version");
 
         public String opt;
         public String longOpt;
@@ -104,6 +111,11 @@ public class Config {
                 .hasArg(true)
                 .argName("ADDRESS")
                 .type(String.class)
+                .build()
+        );
+        options.addOption(Option.builder(Name.VERSION.opt)
+                .longOpt(Name.VERSION.longOpt)
+                .desc("print the version.")
                 .build()
         );
 //        options.addOption(Option.builder(Name.MSG.opt)
@@ -216,8 +228,8 @@ public class Config {
     public void usage() {
         HelpFormatter help = new HelpFormatter();
         String header = "server be receiver, client be sender.";
-        String footer = "feedback: https://github.com/hbk01/hsoc/issues\n" +
-                "feedback: https://gitee.com/hbk01/hsoc/issues";
+        String footer = "feedback(world): https://github.com/hbk01/hsoc/issues\n" +
+                "feedback(China): https://gitee.com/hbk01/hsoc/issues";
         help.printHelp("hsoc", header, options, footer, true);
     }
 
