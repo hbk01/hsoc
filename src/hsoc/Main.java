@@ -13,7 +13,7 @@ public class Main {
         try {
             Config config = new Config(args);
 
-            if (config.hasOption(Config.Name.HELP)) {
+            if (config.help()) {
                 config.usage();
                 System.exit(0);
             } else {

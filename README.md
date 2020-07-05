@@ -4,7 +4,7 @@ hsoc 既可作为服务端，亦可作为客户端，用做局域网收发消息
 
 # Usage
 
-```bash
+```
 usage: hsoc [-a <ADDRESS>] [-c] [-f <FILE> | -m <MESSAGE>] [-h]  [-p <PORT>]
 server be receiver, client be sender.
  -a,--address <ADDRESS>   connection this ip address. (client mode only)

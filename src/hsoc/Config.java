@@ -8,11 +8,12 @@ import java.net.UnknownHostException;
 
 /**
  * Config the program how to run.
+ *
  * @author hbk01 2020/04/09 21:02
  */
 public class Config {
-    private Options options = new Options();
-    private CommandLine commandLine;
+    private final Options options = new Options();
+    private final CommandLine commandLine;
 
     /**
      * define the options opt and longOpt.
@@ -215,9 +216,10 @@ public class Config {
      */
     public void usage() {
         HelpFormatter help = new HelpFormatter();
+        help.setWidth(120);
         String header = "server be receiver, client be sender.";
-        String footer = "feedback: https://github.com/hbk01/hsoc/issues\n" +
-                "feedback: https://gitee.com/hbk01/hsoc/issues";
+        String footer = "feedback(en): https://github.com/hbk01/hsoc/issues\n" +
+                "feedback(zh_CN): https://gitee.com/hbk01/hsoc/issues";
         help.printHelp("hsoc", header, options, footer, true);
     }
 
@@ -228,14 +230,6 @@ public class Config {
      */
     public boolean hasOption(Name opt) {
         return commandLine.hasOption(opt.longOpt);
-    }
-
-    /**
-     * Get the arguments parser.
-     * @return parser
-     */
-    public CommandLine getCommandLine() {
-        return commandLine;
     }
 
     /**
